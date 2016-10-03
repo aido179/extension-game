@@ -12,7 +12,7 @@
   },
 
   "permissions": [
-          "tabs","storage"
+          "tabs","storage", "alarms", "notifications"
         ],
   "background": {
     "scripts": ["background.js"],
