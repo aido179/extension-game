@@ -18,28 +18,37 @@ function extractDomain(url) {
 
 chrome.tabs.onUpdated.addListener(function(id, changeInfo, tab){
   var url = extractDomain(tab.url);
+
   //try to minimize the amount of times we do the check
-  console.log(changeInfo);
   if(changeInfo.status === "complete"){
-    //try to find the url in storage
-    chrome.storage.sync.get(url, function(result){
-      if(result[url]===undefined){
-        //domain not found in storage, so store it.
-        var storeURL = {};
-        storeURL[url] = 1;
-        chrome.storage.sync.set(storeURL, function(){
-          //show notification
-          chrome.notifications.create("new-url found", {
-            type:"image",
-            iconUrl:"icon.png",
-            title:"New website discovered!",
-            message:"You've discovered a new website and increased your scoring capacity!",
-            imageUrl:"internet.jpg"
+    //testing the domain exists...
+    $.ajax(tab.url,{
+      "complete":function(jqXHR, status){
+        if(status==="success"){
+          //try to find the url in storage
+          chrome.storage.sync.get(url, function(result){
+            if(result[url]===undefined){
+              //domain not found in storage, so store it.
+              var storeURL = {};
+              storeURL[url] = 1;
+              chrome.storage.sync.set(storeURL, function(){
+                //show notification
+                chrome.notifications.create("new-url found", {
+                  type:"image",
+                  iconUrl:"icon.png",
+                  title:"New website discovered!",
+                  message:"You've discovered a new website and increased your scoring capacity!",
+                  imageUrl:"internet.jpg"
+                });
+              });
+            }else{
+              //domain has been found in storage, so do nothing.
+            }
           });
-        });
-      }else{
-        //domain has been found in storage, so do nothing.
-      }
+        }else{
+          console.log("No response from url.");
+        }
+      },
     });
   }
 });
