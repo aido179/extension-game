@@ -16,40 +16,53 @@ function extractDomain(url) {
     return domain;
 }
 
+//isValidURL(url) is taken From
+//http://stackoverflow.com/a/23528594/827842
+function isValidURL(url) {
+    var encodedURL = encodeURIComponent(url);
+    var isValid = false;
+    $.ajax({
+      url: "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22" + encodedURL + "%22&format=json",
+      type: "get",
+      async: false,
+      dataType: "json",
+      success: function(data) {
+        isValid = data.query.results != null;
+      },
+      error: function(){
+        isValid = false;
+      }
+    });
+    return isValid;
+}
 chrome.tabs.onUpdated.addListener(function(id, changeInfo, tab){
   var url = extractDomain(tab.url);
 
   //try to minimize the amount of times we do the check
   if(changeInfo.status === "complete"){
     //testing the domain exists...
-    $.ajax(tab.url,{
-      "complete":function(jqXHR, status){
-        if(status==="success"){
-          //try to find the url in storage
-          chrome.storage.sync.get(url, function(result){
-            if(result[url]===undefined){
-              //domain not found in storage, so store it.
-              var storeURL = {};
-              storeURL[url] = 1;
-              chrome.storage.sync.set(storeURL, function(){
-                //show notification
-                chrome.notifications.create("new-url found", {
-                  type:"image",
-                  iconUrl:"icon.png",
-                  title:"New website discovered!",
-                  message:"You've discovered a new website and increased your scoring capacity!",
-                  imageUrl:"internet.jpg"
-                });
-              });
-            }else{
-              //domain has been found in storage, so do nothing.
-            }
+    if(isValidURL(tab.url)){
+      //try to find the url in storage
+      chrome.storage.sync.get(url, function(result){
+        if(result[url]===undefined){
+          //domain not found in storage, so store it.
+          var storeURL = {};
+          storeURL[url] = 1;
+          chrome.storage.sync.set(storeURL, function(){
+            //show notification
+            chrome.notifications.create("new-url found", {
+              type:"image",
+              iconUrl:"img/icon2-128.png",
+              title:"New website discovered!",
+              message:"You've discovered a new website and increased your scoring capacity!",
+              imageUrl:"img/internet.jpg"
+            });
           });
         }else{
-          console.log("No response from url.");
+          //domain has been found in storage, so do nothing.
         }
-      },
-    });
+      });
+    }
   }
 });
 
@@ -74,10 +87,10 @@ chrome.alarms.onAlarm.addListener(function(alarm){
           //show notification
           chrome.notifications.create("update-score", {
             type:"image",
-            iconUrl:"icon.png",
+            iconUrl:"img/icon1-128.png",
             title:"New Score!",
             message:"You've earned "+scoreIncr+" more points! Your new score is "+updatedScore,
-            imageUrl:"thumbs.jpg"
+            imageUrl:"img/thumbs.jpg"
           });
         });
       });
