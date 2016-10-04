@@ -14,6 +14,11 @@ $(document).ready(function(){
     if (result.score===undefined) result.score = 0;
     $(".score").text(result.score);
   });
+  //display the number of websites found
+  chrome.storage.sync.get(null, function(result){
+    var scoreIncr = Object.keys(result).length;
+    $(".domains").text(scoreIncr);
+  });
 });
 
 
