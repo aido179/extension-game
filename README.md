@@ -1,7 +1,10 @@
 
 
-# Extension Boilerplate
-A chrome extension boilerplate including a sample UI page, a normal js file and a background js file. The repo also contains jQuery for convenience. 
+# Web Alchemy
+A chrome extension game where you make gold from the websites your visit.
+
+This extension was built as a tutorial available on medium here:
+https://github.com/aido179/extension-game
 
 
 >Copyright (c) 2016 Aidan Breen
