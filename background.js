@@ -29,6 +29,7 @@ chrome.tabs.onUpdated.addListener(function(id, changeInfo, tab){
         type: "get",
         dataType: "json",
         success: function(data) {
+          //console.log("URL validation successful: "+tab.url);
           if(data.query.results != null){
             //try to find the url in storage
             chrome.storage.sync.get(url, function(result){
